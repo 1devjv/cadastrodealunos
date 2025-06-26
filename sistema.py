@@ -98,14 +98,28 @@ def salvar_dados_em_arquivo(nome_arquivo="alunos.txt"):
 def carregar_dados_de_arquivo(nome_arquivo="alunos.txt"):
     try:
         with open(nome_arquivo, "r", encoding="utf-8") as arquivo:
-            next(arquivo)  # pula o cabeçalho
             for linha in arquivo:
-                dados = linha.strip().split(",")
-                if len(dados) == 5:
-                    matricula, nome, idade, curso, nota = dados
-                    aluno = Aluno(matricula, nome, int(idade), curso, float(nota))
-                    alunos.append(aluno)
-        print("📂 Dados carregados com sucesso!")
+                linha = linha.strip()
+
+                # Ignora linhas vazias ou de cabeçalho/separação
+                if not linha or linha.startswith("📋") or linha.startswith("| Matrícula") or linha.startswith("-"):
+                    continue
+
+                # Remove bordas e divide a linha por '|'
+                partes = linha.strip("|").split("|")
+                if len(partes) != 5:
+                    continue
+
+                matricula = partes[0].strip()
+                nome = partes[1].strip()
+                idade = int(partes[2].strip())
+                curso = partes[3].strip()
+                nota = float(partes[4].strip())
+
+                aluno = Aluno(matricula, nome, idade, curso, nota)
+                alunos.append(aluno)
+
+        print("📂 Dados carregados com sucesso a partir da tabela!")
     except FileNotFoundError:
         print("🔍 Arquivo de dados não encontrado.")
     except Exception as e:
